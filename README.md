@@ -1,488 +1,543 @@
-### Pointers
-In earlier chapters, variables have been explained as locations in the computer's memory which can be accessed by their identifier (their name). This way, the program does not need to care about the physical address of the data in memory; it simply uses the identifier whenever it needs to refer to the variable.
-
-For a C++ program, the memory of a computer is like a succession of memory cells, each one byte in size, and each with a unique address. These single-byte memory cells are ordered in a way that allows data representations larger than one byte to occupy memory cells that have consecutive addresses.
-
-This way, each cell can be easily located in the memory by means of its unique address. For example, the memory cell with the address 1776 always follows immediately after the cell with address 1775 and precedes the one with 1777, and is exactly one thousand cells after 776 and exactly one thousand cells before 2776.
-
-When a variable is declared, the memory needed to store its value is assigned a specific location in memory (its memory address). Generally, C++ programs do not actively decide the exact memory addresses where its variables are stored. Fortunately, that task is left to the environment where the program is run - generally, an operating system that decides the particular memory locations on runtime. However, it may be useful for a program to be able to obtain the address of a variable during runtime in order to access data cells that are at a certain position relative to it.
-
-### Address-of operator (&)
-The address of a variable can be obtained by preceding the name of a variable with an ampersand sign (&), known as *address-of operator*. For example:
-
-	foo = &myvar;
-
-This would assign the address of variable `myvar` to `foo`; by preceding the name of the variable `myvar` with the address-of *operator* (&), we are no longer assigning the content of the variable itself to `foo`, but its address.
-
-The actual address of a variable in memory cannot be known before runtime, but let's assume, in order to help clarify some concepts, that `myvar` is placed during runtime in the memory address 1776.
-
-In this case, consider the following code fragment:
-
-myvar = 25;
-foo = &myvar;
-bar = myvar;
-
-The values contained in each variable after the execution of this are shown in the following diagram:
-
-![image](https://user-images.githubusercontent.com/77676919/156126871-d0a2e087-13c3-47e1-aee7-f7f8da2b0bf0.png)
-
-First, we have assigned the value 25 to `myvar` (a variable whose address in memory we assumed to be 1776).
-
-The second statement assigns `foo` the address of `myvar`, which we have assumed to be 1776.
-
-Finally, the third statement, assigns the value contained in myvar to bar. This is a standard assignment operation, as already done many times in earlier chapters.
-
-The main difference between the second and third statements is the appearance of the *address-of operator* (&).
-
-The variable that stores the address of another variable (like `foo` in the previous example) is what in C++ is called a *pointer*. Pointers are a very powerful feature of the language that has many uses in lower level programming. A bit later, we will see how to declare and use pointers.
-
-### Dereference operator (*)
-
-As just seen, a variable which stores the address of another variable is called a *pointer*. Pointers are said to "point to" the variable whose address they store.
-
-An interesting property of pointers is that they can be used to access the variable they point to directly. This is done by preceding the pointer name with the *dereference operator* ( * ). The operator itself can be read as "value pointed to by".
-
-Therefore, following with the values of the previous example, the following statement:
-
-	baz = *foo;
-
-This could be read as: "`baz` equal to value pointed to by `foo`", and the statement would actually assign the value 25 to `baz`, since `foo` is 1776, and the value pointed to by 1776 (following the example above) would be 25.
-
-![image](https://user-images.githubusercontent.com/77676919/156128357-98d81dcc-0044-4a73-9870-69bd5d519f5c.png)
-
-It is important to clearly differentiate that `foo` refers to the value 1776, while `*foo` (with an asterisk * preceding the identifier) refers to the value stored at address 1776, which in this case is 25. Notice the difference of including or not including the *dereference operator* (I have added an explanatory comment of how each of these two expressions could be read):
-
-	baz = foo;   // baz equal to foo (1776)
-	baz = *foo;  // baz equal to value pointed to by foo (25)  
-
-The reference and dereference operators are thus complementary:
-
-* & is the *address-of operator*, and can be read simply as "address of"
-* * is the *dereference operator*, and can be read as "value pointed to by"
-
-Thus, they have sort of opposite meanings: An address obtained with & can be dereferenced with *.
-
-Earlier, we performed the following two assignment operations:
-
-	myvar = 25;
-	foo = &myvar;
-
-Right after these two statements, all of the following expressions would give true as result:
-
-	myvar == 25
-	&myvar == 1776
-	foo == 1776
-	*foo == 25
-
-The first expression is quite clear, considering that the assignment operation performed on `myvar` was `myvar=25`. The second one uses the address-of operator (&), which returns the address of `myvar`, which we assumed it to have a value of 1776. The third one is somewhat obvious, since the second expression was true and the assignment operation performed on `foo` was `foo=&myvar`. The fourth expression uses the *dereference operator* ( * ) that can be read as "value pointed to by", and the value pointed to by `foo` is indeed 25.
-
-So, after all that, you may also infer that for as long as the address pointed to by `foo` remains unchanged, the following expression will also be true:
-
-	*foo == myvar
+### Array
 	
-### Declaring pointers
+An array is a series of elements of the same type placed in contiguous memory locations that can be individually accessed by adding an index to a unique identifier. To add to it, an array in C++ can store derived data types such as the structures, pointers etc.
 
-Due to the ability of a pointer to directly refer to the value that it points to, a pointer has different properties when it points to a `char` than when it points to an `int` or a `float`. Once dereferenced, the type needs to be known. And for that, the declaration of a pointer needs to include the data type the pointer is going to point to.
+That means that, for example, five values of type `int` can be declared as an array without having to declare 5 different variables (each with its own identifier). Instead, using an array, the five `int` values are stored in contiguous memory locations, and all five can be accessed using the same identifier, with the proper index.
 
-The declaration of pointers follows this syntax:
+For example, an array containing 5 integer values of type `int` called `foo` could be represented as:
 
-	type * name;
+![image](https://user-images.githubusercontent.com/77676919/156010617-45e3ffde-62b5-4b20-823c-4fd6cd626006.png)
 
-where `type` is the data type pointed to by the pointer. This type is not the type of the pointer itself, but the type of the data the pointer points to. For example:
+where each blank panel represents an element of the array. In this case, these are values of type `int`. These elements are numbered from 0 to 4, being 0 the first and 4 the last; In C++, the first element in an array is always numbered with a zero (not a one), no matter its length.
 
-int * number;
-char * character;
-double * decimals;
+Like a regular variable, an array must be declared before it is used. A typical declaration for an array in C++ is:
 
-These are three declarations of pointers. Each one is intended to point to a different data type, but, in fact, all of them are pointers and all of them are likely going to occupy the same amount of space in memory (the size in memory of a pointer depends on the platform where the program runs). Nevertheless, the data to which they point to do not occupy the same amount of space nor are of the same type: the first one points to an `int`, the second one to a `char`, and the last one to a `double`. Therefore, although these three example variables are all of them pointers, they actually have different types: int*, char*, and double* respectively, depending on the type they point to.
+    type name [elements];  
+    
+where type is a valid type (such as `int, float, double, char...`), `name` is a valid identifier and the `elements` field (which is always enclosed in square brackets [ ]), specifies the length of the array in terms of the number of elements.
 
-Note that the asterisk ( * ) used when declaring a pointer only means that it is a pointer (it is part of its type compound specifier), and should not be confused with the *dereference operator* seen a bit earlier, but which is also written with an asterisk ( * ). They are simply two different things represented with the same sign.
+Therefore, the `foo` array, with five elements of type `int`, can be declared as:
 
-Let's see an example on pointers:
+    int foo [5];
 
-	// my first pointer
+**Note**: The `elements` field within square brackets [ ], representing the number of elements in the array, must be a *constant expression*, since arrays are blocks of static memory whose size must be determined at compile time, before the program runs.
+
+![image](https://user-images.githubusercontent.com/77676919/156177485-ccf6d4f1-266d-48d6-8850-6494faa39c87.png)
+
+**Note**: In above image `int a[3]={[0…1]=3};` this kind of declaration has been obsolete since GCC 2.5
+
+There are various ways in which we can declare an array. It can be done by specifying its type and size, by initializing it or both.
+
+**Array declaration by specifying size **
+
+	// Array declaration by specifying size
+	int arr1[10];
+
+	// With recent C/C++ versions, we can also
+	// declare an array of user specified size
+	int n = 10;
+	int arr2[n];
+	
+**Array declaration by initializing elements**
+
+	// Array declaration by initializing elements
+	int arr[] = { 10, 20, 30, 40 }
+
+	// Compiler creates an array of size 4.
+	// above is same as  "int arr[4] = {10, 20, 30, 40}"
+	
+**Array declaration by specifying size and initializing elements**
+
+	// Array declaration by specifying size and initializing
+	// elements
+	int arr[6] = { 10, 20, 30, 40 }
+
+	// Compiler creates an array of size 6, initializes first
+	// 4 elements as specified by user and rest two elements as
+	// 0. above is same as  "int arr[] = {10, 20, 30, 40, 0, 0}"
+
+### Initializing arrays
+
+By default, regular arrays of *local scope* (for example, those declared within a function) are left uninitialized. This means that none of its elements are set to any particular value; their contents are undetermined at the point the array is declared.
+
+But the elements in an array can be explicitly initialized to specific values when it is declared, by enclosing those initial values in braces { }. For example:
+
+    int foo [5] = { 16, 2, 77, 40, 12071 }; 
+
+This statement declares an array that can be represented like this:
+
+![image](https://user-images.githubusercontent.com/77676919/156014423-29d67a46-a19e-4e48-80e6-c8b52d60c53a.png)
+
+The number of values between braces { } shall not be greater than the number of elements in the array. For example, in the example above, foo was declared having 5 elements (as specified by the number enclosed in square brackets, [ ] ), and the braces { } contained exactly 5 values, one for each element. If declared with less, the remaining elements are set to their default values (which for fundamental types, means they are filled with zeroes). For example:
+
+    int bar [5] = { 10, 20, 30 };
+    
+Will create an array like this:
+
+![image](https://user-images.githubusercontent.com/77676919/156015595-21b2a592-ae72-4765-89ae-7de1e6065f96.png)
+
+The initializer can even have no values, just the braces:
+
+    int baz [5] = { }; 
+
+This creates an array of five `int` values, each initialized with a value of zero:
+
+![image](https://user-images.githubusercontent.com/77676919/156015810-416443af-ecc6-48dd-8208-74975b936f22.png)
+
+When an initialization of values is provided for an array, C++ allows the possibility of leaving the square brackets empty [ ]. In this case, the compiler will assume automatically a size for the array that matches the number of values included between the braces { }:
+
+	int foo [] = { 16, 2, 77, 40, 12071 };
+
+After this declaration, array `foo` would be 5 `int` long, since we have provided 5 initialization values.
+
+Finally, the evolution of C++ has led to the adoption of *universal initialization* also for arrays. Therefore, there is no longer need for the equal sign between the declaration and the initializer. Both these statements are equivalent:
+
+    int foo[] = { 10, 20, 30 };
+    int foo[] { 10, 20, 30 }; 
+
+Static arrays, and those declared directly in a namespace (outside any function), are always initialized. If no explicit initializer is specified, all the elements are default-initialized (with zeroes, for fundamental types).
+
+**Advantages of an Array in C/C++: **
+
+1.Random access of elements using array index.
+
+2.Use of fewer line of code as it creates a single array of multiple elements.
+
+3.Easy access to all the elements.
+
+4.Traversal through the array becomes easy using a single loop.
+
+5.Sorting becomes easy as it can be accomplished by writing fewer line of code.
+
+**Disadvantages of an Array in C/C++:**
+
+1.Allows a fixed number of elements to be entered which is decided at the time of declaration. Unlike a linked list, an array in C is not dynamic.
+
+2.Insertion and deletion of elements can be costly since the elements are needed to be managed in accordance with the new memory allocation.
+
+### Accessing the values of an array
+
+![image](https://user-images.githubusercontent.com/77676919/156184622-ef20f18f-96bc-412f-aec5-7fc183b1350f.png)
+
+The values of any of the elements in an array can be accessed just like the value of a regular variable of the same type. The syntax is:
+
+    name[index]
+
+Following the previous examples in which `foo` had 5 elements and each of those elements was of type `int`, the name which can be used to refer to each element is the following:
+
+![image](https://user-images.githubusercontent.com/77676919/156019906-b706c683-1a23-4a6f-b8d1-abe0da6f67ea.png)
+
+For example, the following statement stores the value 75 in the third element of `foo`:
+
+    foo [2] = 75;
+    
+and, for example, the following copies the value of the third element of `foo` to a variable called `x`:
+
+    x = foo[2];
+    
+Therefore, the expression `foo[2]` is itself a variable of type `int`.
+
+Notice that the third element of `foo` is specified `foo[2]`, since the first one is `foo[0]`, the second one is `foo[1]`, and therefore, the third one is `foo[2]`. By this same reason, its last element is `foo[4]`. Therefore, if we write `foo[5]`, we would be accessing the sixth element of `foo`, and therefore actually exceeding the size of the array.
+
+In C++, it is syntactically correct to exceed the valid range of indices for an array. This can create problems, since the following program compiles fine but produce unexpected output when run in my VS Code and cause warnings on compilation, and produce unexpected output when run in my Visual Studio.
+
+	// This C++ program compiles fine
+	// as index out of bound
+	// is not checked in C.
+
 	#include <iostream>
 	using namespace std;
 
-	int main ()
+	int main()
 	{
-	  int firstvalue, secondvalue;
-	  int * mypointer;
+		int arr[2];
 
-	  mypointer = &firstvalue;
-	  *mypointer = 10;
-	  mypointer = &secondvalue;
-	  *mypointer = 20;
-	  cout << "firstvalue is " << firstvalue << '\n';
-	  cout << "secondvalue is " << secondvalue << '\n';
-	  return 0;
+		cout << arr[3] << " ";
+		cout << arr[-2] << " ";
+
+		return 0;
 	}
 	
 **Output**
+
+	6422240 59  // in VS Code
+	-858993460 -858993460  // in Visual Studio
 	
-	firstvalue is 10
-	secondvalue is 20	
+another case: In C++, it is a compiler error to initialize an array with more elements than the specified size.
 
-Each assignment operation includes a comment on how each line could be read: i.e., replacing ampersands (&) by "address of", and asterisks ( * ) by "value pointed to by".
-
-Notice that there are expressions with pointers `p1` and `p2`, both with and without the *dereference operator* ( * ). The meaning of an expression using the *dereference operator* ( * ) is very different from one that does not. When this operator precedes the pointer name, the expression refers to the value being pointed, while when a pointer name appears without this operator, it refers to the value of the pointer itself (i.e., the address of what the pointer is pointing to).
-
-Another thing that may call your attention is the line:
-
-	int * p1, * p2;
-
-This declares the two pointers used in the previous example. But notice that there is an asterisk (* ) for each pointer, in order for both to have type `int*` (pointer to `int`). This is required due to the precedence rules. Note that if, instead, the code was:
-
-	int * p1, p2;
-
-`p1` would indeed be of type `int*`, but `p2` would be of type `int`. Spaces do not matter at all for this purpose. But anyway, simply remembering to put one asterisk per pointer is enough for most pointer users interested in declaring multiple pointers per statement. Or even better: use a different statement for each variable.
-
-### Pointers and arrays
-
-The concept of arrays is related to that of pointers. In fact, arrays work very much like pointers to their first elements, and, actually, an array can always be implicitly converted to the pointer of the proper type. For example, consider these two declarations:
-
-	int myarray [20];
-	int * mypointer;
-
-The following assignment operation would be valid:
-
-	mypointer = myarray;
-
-After that, `mypointer` and `myarray` would be equivalent and would have very similar properties. The main difference being that `mypointer` can be assigned a different address, whereas `myarray` can never be assigned anything, and will always represent the same block of 20 elements of type `int`. Therefore, the following assignment would not be valid:
- 
-	myarray = mypointer;
-
-Let's see an example that mixes arrays and pointers:
-
-	// more pointers
 	#include <iostream>
 	using namespace std;
+
+	int main()
+	{
+
+		// Array declaration by initializing it
+		// with more elements than specified size.
+		int arr[2] = {10, 20, 30, 40, 50};
+
+		return 0;
+	}
+	
+**Note**: The program won’t compile in C++. If we save the above program as a .cpp, the program generates compiler error “error: too many initializers for ‘int [2]'”. 
+
+At this point, it is important to be able to clearly distinguish between the two uses that brackets [ ] have related to arrays. They perform two different tasks: one is to specify the size of arrays when they are declared; and the second one is to specify indices for concrete array elements when they are accessed. Do not confuse these two possible uses of brackets [ ] with arrays.
+
+    int foo[5];         // declaration of a new array
+    foo[2] = 75;        // access to an element of the array.  
+
+The main difference is that the declaration is preceded by the type of the elements, while the access is not.
+
+Some other valid operations with arrays:
+
+	foo[0] = a;
+	foo[a] = 75;
+	b = foo [a+2];
+	foo[foo[a]] = foo[2] + 5;
+
+For example:
+
+	// arrays example
+	#include <iostream>
+	using namespace std;
+
+	int foo [] = {16, 2, 77, 40, 12071};
+	int n, result=0;
 
 	int main ()
 	{
-	  int numbers[5];
-	  int * p;
-	  p = numbers;  *p = 10;
-	  p++;  *p = 20;
-	  p = &numbers[2];  *p = 30;
-	  p = numbers + 3;  *p = 40;
-	  p = numbers;  *(p+4) = 50;
-	  for (int n=0; n<5; n++)
-		cout << numbers[n] << ", ";
-	  return 0;
-	}
-	
-**Output**
-	
-	10, 20, 30, 40, 50, 
-
-Pointers and arrays support the same set of operations, with the same meaning for both. The main difference being that pointers can be assigned new addresses, while arrays cannot.
-
-In the chapter about arrays, brackets ([]) were explained as specifying the index of an element of the array. Well, in fact these brackets are a dereferencing operator known as *offset operator*. They dereference the variable they follow just as * does, but they also add the number between brackets to the address being dereferenced. For example:
-
-	a[5] = 0;       // a [offset of 5] = 0
-	*(a+5) = 0;     // pointed to by (a+5) = 0  
-
-
-These two expressions are equivalent and valid, not only if a is a pointer, but also if a is an array. Remember that if an array, its name can be used just like a pointer to its first element.
-
-### Pointer initialization
-
-Pointers can be initialized to point to specific locations at the very moment they are defined:
-
-	int myvar;
-	int * myptr = &myvar;
-
-The resulting state of variables after this code is the same as after:
-
-	int myvar;
-	int * myptr;
-	myptr = &myvar;
-
-When pointers are initialized, what is initialized is the address they point to (i.e., `myptr`), never the value being pointed (i.e., `*myptr`). Therefore, the code above shall not be confused with:
-
-	int myvar;
-	int * myptr;
-	*myptr = &myvar;
-
-Which anyway would not make much sense (and is not valid code).
-
-The asterisk ( * ) in the pointer declaration (line 2) only indicates that it is a pointer, it is not the dereference operator (as in line 3). Both things just happen to use the same sign: * . As always, spaces are not relevant, and never change the meaning of an expression.
-
-Pointers can be initialized either to the address of a variable (such as in the case above), or to the value of another pointer (or array):
-
-	int myvar;
-	int *foo = &myvar;
-	
-### Pointer arithmetics
-
-To conduct arithmetical operations on pointers is a little different than to conduct them on regular integer types. To begin with, only addition and subtraction operations are allowed; the others make no sense in the world of pointers. But both addition and subtraction have a slightly different behavior with pointers, according to the size of the data type to which they point.
-
-When fundamental data types were introduced, we saw that types have different sizes. For example: `char` always has a size of 1 byte, `short` is generally larger than that, and `int` and `long` are even larger; the exact size of these being dependent on the system. For example, let's imagine that in a given system, `char` takes 1 byte, `short` takes 2 bytes, and `long` takes 4.
-
-Suppose now that we define three pointers in this compiler:
-
-	char *mychar;
-	short *myshort;
-	long *mylong;
-
-and that we know that they point to the memory locations 1000, 2000, and 3000, respectively.
-
-Therefore, if we write:
-
-	++mychar;
-	++myshort;
-	++mylong;
-
-`mychar`, as one would expect, would contain the value 1001. But not so obviously, `myshort` would contain the value 2002, and `mylong` would contain 3004, even though they have each been incremented only once. The reason is that, when adding one to a pointer, the pointer is made to point to the following element of the same type, and, therefore, the size in bytes of the type it points to is added to the pointer.
-
-![image](https://user-images.githubusercontent.com/77676919/156166825-11ffd49a-c84c-4756-9142-3818e77e8802.png)
-
-This is applicable both when adding and subtracting any number to a pointer. It would happen exactly the same if we wrote:
-
-	mychar = mychar + 1;
-	myshort = myshort + 1;
-	mylong = mylong + 1;
-
-Regarding the increment (++) and decrement (--) operators, they both can be used as either prefix or suffix of an expression, with a slight difference in behavior: as a prefix, the increment happens before the expression is evaluated, and as a suffix, the increment happens after the expression is evaluated. This also applies to expressions incrementing and decrementing pointers, which can become part of more complicated expressions that also include dereference operators ( * ). Remembering operator precedence rules, we can recall that postfix operators, such as increment and decrement, have higher precedence than prefix operators, such as the dereference operator ( * ). Therefore, the following expression:
-
-	*p++
-
-is equivalent to `*(p++)`. And what it does is to increase the value of `p` (so it now points to the next element), but because ++ is used as postfix, the whole expression is evaluated as the value pointed originally by the pointer (the address it pointed to before being incremented).
-
-Essentially, these are the four possible combinations of the dereference operator with both the prefix and suffix versions of the increment operator (the same being applicable also to the decrement operator):
-
-	*p++   // same as *(p++): increment pointer, and dereference unincremented address
-	*++p   // same as *(++p): increment pointer, and dereference incremented address
-	++*p   // same as ++(*p): dereference pointer, and increment the value it points to
-	(*p)++ // dereference pointer, and post-increment the value it points to 
-
-A typical -but not so simple- statement involving these operators is:
- 
-	*p++ = *q++;
-
-Because ++ has a higher precedence than * , both `p` and `q` are incremented, but because both increment operators (++) are used as postfix and not prefix, the value assigned to `*p` is `*q` before both `p` and `q` are incremented. And then both are incremented. It would be roughly equivalent to:
-
-	*p = *q;
-	++p;
-	++q;
-
-Like always, parentheses reduce confusion by adding legibility to expressions.
-
-### Pointers and const
-
-Pointers can be used to access a variable by its address, and this access may include modifying the value pointed. But it is also possible to declare pointers that can access the pointed value to read it, but not to modify it. For this, it is enough with qualifying the type pointed to by the pointer as const. For example:
-
-	int x;
-	int y = 10;
-	const int * p = &y;
-	x = *p;          // ok: reading p
-	*p = x;          // error: modifying p, which is const-qualified 
-
-Here `p` points to a variable, but points to it in a `const`-qualified manner, meaning that it can read the value pointed, but it cannot modify it. Note also, that the expression `&y` is of type `int*`, but this is assigned to a pointer of type `const int*`. This is allowed: a pointer to non-const can be implicitly converted to a pointer to `const`. But not the other way around! As a safety feature, pointers to `const` are not implicitly convertible to pointers to non-const.
-
-One of the use cases of pointers to const elements is as function parameters: a function that takes a pointer to non-const as parameter can modify the value passed as argument, while a function that takes a pointer to const as parameter cannot.
-
-	// pointers as arguments:
-	#include <iostream>
-	using namespace std;
-
-	void increment_all (int* start, int* stop)
-	{
-	  int * current = start;
-	  while (current != stop) {
-		++(*current);  // increment value pointed
-		++current;     // increment pointer
+	  for ( n=0 ; n<5 ; n++ )
+	  {
+		result += foo[n];
 	  }
-	}
-
-	void print_all (const int* start, const int* stop)
-	{
-	  const int * current = start;
-	  while (current != stop) {
-		cout << *current << '\n';
-		++current;     // increment pointer
-	  }
-	}
-
-	int main ()
-	{
-	  int numbers[] = {10,20,30};
-	  increment_all (numbers,numbers+3);
-	  print_all (numbers,numbers+3);
+	  cout << result;
 	  return 0;
 	}
 	
 **Output**
-
-	11
-	21
-	31
-
-Note that `print_all` uses pointers that point to constant elements. These pointers point to constant content they cannot modify, but they are not constant themselves: i.e., the pointers can still be incremented or assigned different addresses, although they cannot modify the content they point to.
-
-And this is where a second dimension to constness is added to pointers: Pointers can also be themselves `const`. And this is specified by appending const to the pointed type (after the asterisk):
-
-	int x;
-		  int *       p1 = &x;  // non-const pointer to non-const int
-	const int *       p2 = &x;  // non-const pointer to const int
-		  int * const p3 = &x;  // const pointer to non-const int
-	const int * const p4 = &x;  // const pointer to const int 
-
-The syntax with `const` and pointers is definitely tricky, and recognizing the cases that best suit each use tends to require some experience. In any case, it is important to get constness with pointers (and references) right sooner rather than later, but you should not worry too much about grasping everything if this is the first time you are exposed to the mix of const and pointers. More use cases will show up in coming chapters.
-
-To add a little bit more confusion to the syntax of `const` with pointers, the `const` qualifier can either precede or follow the pointed type, with the exact same meaning:
-
-	const int * p2a = &x;  //      non-const pointer to const int
-	int const * p2b = &x;  // also non-const pointer to const int 
-
-As with the spaces surrounding the asterisk, the order of `const` in this case is simply a matter of style. This chapter uses a prefix const, as for historical reasons this seems to be more extended, but both are exactly equivalent. The merits of each style are still intensely debated on the internet.
-
-### Pointers and string literals
-
-As pointed earlier, *string literals* are arrays containing null-terminated character sequences. In earlier sections, string literals have been used to be directly inserted into `cout`, to initialize strings and to initialize arrays of characters.
-
-But they can also be accessed directly. String literals are arrays of the proper array type to contain all its characters plus the terminating null-character, with each of the elements being of type `const char` (as literals, they can never be modified). For example:
-
-	const char * foo = "hello"; 
-
-This declares an array with the literal representation for `"hello"`, and then a pointer to its first element is assigned to `foo`. If we imagine that `"hello"` is stored at the memory locations that start at address 1702, we can represent the previous declaration as:
-
-![image](https://user-images.githubusercontent.com/77676919/156171838-7015a997-2883-49fc-bc12-2336adbc1758.png)
-
-Note that here `foo` is a pointer and contains the value 1702, and not `'h'`, nor `"hello"`, although 1702 indeed is the address of both of these.
-
-The pointer `foo` points to a sequence of characters. And because pointers and arrays behave essentially in the same way in expressions, `foo` can be used to access the characters in the same way arrays of null-terminated character sequences are. For example:
-
-	*(foo+4)
-	foo[4]
-
-Both expressions have a value of `'o'` (the fifth element of the array).
-
-### Pointers to pointers
-
-C++ allows the use of pointers that point to pointers, that these, in its turn, point to data (or even to other pointers). The syntax simply requires an asterisk ( * ) for each level of indirection in the declaration of the pointer:
-
-	char a;
-	char * b;
-	char ** c;
-	a = 'z';
-	b = &a;
-	c = &b;
-
-
-This, assuming the randomly chosen memory locations for each variable of 7230, 8092, and 10502, could be represented as:
-
-![image](https://user-images.githubusercontent.com/77676919/156172250-73f444eb-ecf5-4cc6-84dc-7fbe85c85cec.png)
-
-With the value of each variable represented inside its corresponding cell, and their respective addresses in memory represented by the value under them.
-
-The new thing in this example is variable `c`, which is a pointer to a pointer, and can be used in three different levels of indirection, each one of them would correspond to a different value:
-
-* c is of type char** and a value of 8092
-* *c is of type char* and a value of 7230
-* **c is of type char and a value of 'z'
-
-### void pointers
-
-The `void` type of pointer is a special type of pointer. In C++, void represents the absence of type. Therefore, `void` pointers are pointers that point to a value that has no type (and thus also an undetermined length and undetermined dereferencing properties).
-
-This gives `void` pointers a great flexibility, by being able to point to any data type, from an integer value or a float to a string of characters. In exchange, they have a great limitation: the data pointed to by them cannot be directly dereferenced (which is logical, since we have no type to dereference to), and for that reason, any address in a `void` pointer needs to be transformed into some other pointer type that points to a concrete data type before being dereferenced.
-
-One of its possible uses may be to pass generic parameters to a function. For example:
-
-	// increaser
+	
+	12206
+	
+example:
+	
 	#include <iostream>
 	using namespace std;
 
-	void increase (void* data, int psize)
+	int main()
 	{
-	  if ( psize == sizeof(char) )
-	  { char* pchar; pchar=(char*)data; ++(*pchar); }
-	  else if (psize == sizeof(int) )
-	  { int* pint; pint=(int*)data; ++(*pint); }
-	}
+		int arr[5];
+		arr[0] = 5;
+		arr[2] = -10;
 
-	int main ()
-	{
-	  char a = 'x';
-	  int b = 1602;
-	  increase (&a,sizeof(a));
-	  increase (&b,sizeof(b));
-	  cout << a << ", " << b << '\n';
-	  return 0;
+		// this is same as arr[1] = 2
+		arr[3 / 2] = 2;
+		arr[3] = arr[0];
+
+		cout << arr[0] << " " << arr[1] << " " << arr[2] << " "
+			<< arr[3];
+
+		return 0;
 	}
 	
 **Output**
 
-	y, 1603
+5 2 -10 5
 
-`sizeof` is an operator integrated in the C++ language that returns the size in bytes of its argument. For non-dynamic data types, this value is a constant. Therefore, for example, `sizeof(char)` is 1, because char has always a size of one byte.
+**The elements are stored at contiguous memory locations **
 
-### Invalid pointers and null pointers
+example: 
 
-In principle, pointers are meant to point to valid addresses, such as the address of a variable or the address of an element in an array. But pointers can actually point to any address, including addresses that do not refer to any valid element. Typical examples of this are *uninitialized pointers* and pointers to nonexistent elements of an array:
+	// C++ program to demonstrate that array elements
+	// are stored contiguous locations
 
-	int * p;               // uninitialized pointer (local variable)
-
-	int myarray[10];
-	int * q = myarray+20;  // element out of bounds 
-
-Neither `p` nor `q` point to addresses known to contain a value, but none of the above statements causes an error. In C++, pointers are allowed to take any address value, no matter whether there actually is something at that address or not. What can cause an error is to dereference such a pointer (i.e., actually accessing the value they point to). Accessing such a pointer causes undefined behavior, ranging from an error during runtime to accessing some random value.
-
-But, sometimes, a pointer really needs to explicitly point to nowhere, and not just an invalid address. For such cases, there exists a special value that any pointer type can take: the *null pointer value*. This value can be expressed in C++ in two ways: either with an integer value of zero, or with the `nullptr` keyword:
-
-	int * p = 0;
-	int * q = nullptr;
-
-Here, both `p` and `q` are *null pointers* , meaning that they explicitly point to nowhere, and they both actually compare equal: all *null pointers* compare equal to other *null pointers*. It is also quite usual to see the defined constant `NULL` be used in older code to refer to the *null pointers* value:
-
-	int * r = NULL;
-
-`NULL` is defined in several headers of the standard library, and is defined as an alias of some null pointer constant value (such as `0` or `nullptr`).
-
-Do not confuse *null pointers*  with `void` pointers! A *null pointer* is a value that any pointer can take to represent that it is pointing to "nowhere", while a void pointer is a type of pointer that can point to somewhere without a specific type. One refers to the value stored in the pointer, and the other to the type of data it points to.
-
-### Pointers to functions
-
-C++ allows operations with pointers to functions. The typical use of this is for passing a function as an argument to another function. Pointers to functions are declared with the same syntax as a regular function declaration, except that the name of the function is enclosed between parentheses () and an asterisk (*) is inserted before the name:
-
-	// pointer to functions
 	#include <iostream>
 	using namespace std;
 
-	int addition (int a, int b)
-	{ return (a+b); }
-
-	int subtraction (int a, int b)
-	{ return (a-b); }
-
-	int operation (int x, int y, int (*functocall)(int,int))
+	int main()
 	{
-	  int g;
-	  g = (*functocall)(x,y);
-	  return (g);
+		// an array of 10 integers.
+		// If arr[0] is stored at
+		// address x, then arr[1] is
+		// stored at x + sizeof(int)
+		// arr[2] is stored at x +
+		// sizeof(int) + sizeof(int)
+		// and so on.
+		int arr[5], i;
+
+		cout << "Size of integer in this compiler is "
+			<< sizeof(int) << "\n";
+
+		for (i = 0; i < 5; i++)
+			// The use of '&' before a variable name, yields
+			// address of variable.
+			cout << "Address arr[" << i << "] is " << &arr[i]
+				<< "\n";
+
+		return 0;
+	}
+	
+**Output**
+
+	Size of integer in this compiler is 4
+	Address arr[0] is 0x61fea8
+	Address arr[1] is 0x61feac
+	Address arr[2] is 0x61feb0
+	Address arr[3] is 0x61feb4
+	Address arr[4] is 0x61feb8
+	
+**Another way to traverse the array**
+	
+	#include<bits/stdc++.h>
+	using namespace std;
+
+	int main()
+	{
+		int arr[6]={11,12,13,14,15,16};
+		// Way 1
+		for(int i=0;i<6;i++)
+			cout<<arr[i]<<" ";
+
+	cout<<endl;
+		// Way 2
+		cout<<"By Other Method:"<<endl;
+		for(int i=0;i<6;i++)
+			cout<<i[arr]<<" ";
+
+		cout<<endl;
+
+		return 0;
+	}
+	
+**Output**
+
+	11 12 13 14 15 16 
+	By Other Method:
+	11 12 13 14 15 16
+	
+### Multidimensional arrays
+
+Multidimensional arrays can be described as "arrays of arrays". For example, a bidimensional array can be imagined as a two-dimensional table made of elements, all of them of a same uniform data type.
+
+![image](https://user-images.githubusercontent.com/77676919/156025109-05980a7d-27ec-4863-8892-7c5ec296efac.png)
+
+jimmy represents a bidimensional array of 3 per 5 elements of type int. The C++ syntax for this is:
+
+	int jimmy [3][5];
+	
+and, for example, the way to reference the second element vertically and fourth horizontally in an expression would be:
+ 
+	jimmy[1][3]
+
+![image](https://user-images.githubusercontent.com/77676919/156025328-ce1501b1-6ff8-4def-81f6-b3f631047d73.png)
+
+(remember that array indices always begin with zero).
+
+Multidimensional arrays are not limited to two indices (i.e., two dimensions). They can contain as many indices as needed. Although be careful: the amount of memory needed for an array increases exponentially with each dimension. For example:
+
+	char century [100][365][24][60][60];
+
+declares an array with an element of type char for each second in a century. This amounts to more than 3 billion char! So this declaration would consume more than 3 gigabytes of memory!
+
+At the end, multidimensional arrays are just an abstraction for programmers, since the same results can be achieved with a simple array, by multiplying its indices:
+
+	int jimmy [3][5];   // is equivalent to
+	int jimmy [15];     // (3 * 5 = 15)  
+
+With the only difference that with multidimensional arrays, the compiler automatically remembers the depth of each imaginary dimension. The following two pieces of code produce the exact same result, but one uses a bidimensional array while the other uses a simple array:
+
+**multidimensional array**
+
+	#define WIDTH 5
+	#define HEIGHT 3
+
+	int jimmy [HEIGHT][WIDTH];
+	int n,m;
+
+	int main ()
+	{
+	  for (n=0; n<HEIGHT; n++)
+		for (m=0; m<WIDTH; m++)
+			pseudo-multidimensional array
+		  jimmy[n][m]=(n+1)*(m+1);
+		}
+	}
+	
+**pseudo-multidimensional array**
+
+	#define WIDTH 5
+	#define HEIGHT 3
+
+	int jimmy [HEIGHT * WIDTH];
+	int n,m;
+
+	int main ()
+	{
+	  for (n=0; n<HEIGHT; n++)
+		for (m=0; m<WIDTH; m++)
+		{
+		  jimmy[n*WIDTH+m]=(n+1)*(m+1);
+		}
+	}
+	
+None of the two code snippets above produce any output on the screen, but both assign values to the memory block called jimmy in the following way:
+
+![image](https://user-images.githubusercontent.com/77676919/156029633-deeed229-89e0-4c2d-831b-f12633c57652.png)
+
+Note that the code uses defined constants for the width and height, instead of using directly their numerical values. This gives the code a better readability, and allows changes in the code to be made easily in one place.Initializing Two-Dimensional Arrays
+
+**Initializing Two-Dimensional Arrays**
+
+Multidimensioned arrays may be initialized by specifying bracketed values for each row. Following is an array with 3 rows and each row have 4 columns.
+
+	int a[3][4] = {  
+	   {0, 1, 2, 3} ,   /*  initializers for row indexed by 0 */
+	   {4, 5, 6, 7} ,   /*  initializers for row indexed by 1 */
+	   {8, 9, 10, 11}   /*  initializers for row indexed by 2 */
+	};
+	
+The nested braces, which indicate the intended row, are optional. The following initialization is equivalent to previous example −
+
+	int a[3][4] = {0,1,2,3,4,5,6,7,8,9,10,11};
+
+**Accessing Two-Dimensional Array Elements**
+
+![image](https://user-images.githubusercontent.com/77676919/156205103-13d42d25-c32a-48f2-8d91-d157505d7ea2.png)
+
+An element in 2-dimensional array is accessed by using the subscripts, i.e., row index and column index of the array. For example −
+
+	int val = a[2][3];
+	
+The above statement will take 4th element from the 3rd row of the array. You can verify it in the above digram.
+
+	#include <iostream>
+	using namespace std;
+
+	int main () {
+	   // an array with 5 rows and 2 columns.
+	   int a[5][2] = { {0,0}, {1,2}, {2,4}, {3,6},{4,8}};
+
+	   // output each array element's value                      
+	   for ( int i = 0; i < 5; i++ )
+		  for ( int j = 0; j < 2; j++ ) {
+
+			 cout << "a[" << i << "][" << j << "]: ";
+			 cout << a[i][j]<< endl;
+		  }
+
+	   return 0;
+	}
+	
+When the above code is compiled and executed, it produces the following result −
+
+	a[0][0]: 0
+	a[0][1]: 0
+	a[1][0]: 1
+	a[1][1]: 2
+	a[2][0]: 2
+	a[2][1]: 4
+	a[3][0]: 3
+	a[3][1]: 6
+	a[4][0]: 4
+	a[4][1]: 8
+	
+As explained above, you can have arrays with any number of dimensions, although it is likely that most of the arrays you create will be of one or two dimensions.
+
+### Arrays as parameters
+
+At some point, we may need to pass an array to a function as a parameter. In C++, it is not possible to pass the entire block of memory represented by an array to a function directly as an argument. But what can be passed instead is its address. In practice, this has almost the same effect, and it is a much faster and more efficient operation.
+
+To accept an array as parameter for a function, the parameters can be declared as the array type, but with empty brackets, omitting the actual size of the array. For example:
+
+	void procedure (int arg[])
+
+This function accepts a parameter of type "array of `int`" called arg. In order to pass to this function an array declared as:
+
+	int myarray [40];
+
+it would be enough to write a call like this:
+ 
+	procedure (myarray);
+
+Here you have a complete example:
+	
+	// arrays as parameters
+	#include <iostream>
+	using namespace std;
+
+	void printarray (int arg[], int length) {
+	  for (int i=0; i<length; i++)
+		cout << arg[i] << " ";
+	  cout << endl;
 	}
 
 	int main ()
 	{
-	  int m,n;
-	  int (*minus)(int,int) = subtraction;
-
-	  m = operation (7, 5, addition);
-	  n = operation (20, m, minus);
-	  cout <<n;
-	  return 0;
+	  int firstarray[] = {5, 10, 15};
+	  int secondarray[] = {2, 4, 6, 8, 10};
+	  printarray (firstarray,3);
+	  printarray (secondarray,5);
 	}
 	
 **Output**
 	
-	8
+	5 10 15
+	2 4 6 8 10
 
-In the example above, `minus` is a pointer to a function that has two parameters of type `int`. It is directly initialized to point to the function `subtraction`:
+In the code above, the first parameter `(int arg[])` accepts any array whose elements are of type `int`, whatever its length. For that reason, we have included a second parameter that tells the function the length of each array that we pass to it as its first parameter. This allows the for loop that prints out the array to know the range to iterate in the array passed, without going out of range.
 
-	int (* minus)(int,int) = subtraction;
+In a function declaration, it is also possible to include multidimensional arrays. The format for a tridimensional array parameter is:
+ 
+	base_type[][depth][depth]
 
+For example, a function with a multidimensional array as argument could be:
+ 
+	void procedure (int myarray[][3][4])
+
+Notice that the first brackets [ ] are left empty, while the following ones specify sizes for their respective dimensions. This is necessary in order for the compiler to be able to determine the depth of each additional dimension.
+
+In a way, passing an array as argument always loses a dimension. The reason behind is that, for historical reasons, arrays cannot be directly copied, and thus what is really passed is a pointer. This is a common source of errors for novice programmers. Although a clear understanding of pointers, explained in a coming chapter, helps a lot.
+
+### Library arrays	
+
+The arrays explained above are directly implemented as a language feature, inherited from the C language. They are a great feature, but by restricting its copy and easily decay into pointers, they probably suffer from an excess of optimization.
+
+To overcome some of these issues with language built-in arrays, C++ provides an alternative array type as a standard container. It is a type template (a class template, in fact) defined in header `<array>`.
+
+Containers are a library feature that falls out of the scope of this tutorial, and thus the class will not be explained in detail here. Suffice it to say that they operate in a similar way to built-in arrays, except that they allow being copied (an actually expensive operation that copies the entire block of memory, and thus to use with care) and decay into pointers only when explicitly told to do so (by means of its member data).
+
+Just as an example, these are two versions of the same example using the language built-in array described in this chapter, and the container in the library:
+
+**language built-in array**
+
+	#include <iostream>
+
+	using namespace std;
+
+	int main()
+	{
+	  int myarray[3] = {10,20,30};
+
+	  for (int i=0; i<3; i++)
+	  myarray[i]++;
+
+	  for (int elem : myarray)
+	    cout << elem << '\n';
+	}
 	
+**container library array**
 
+	#include <iostream>
+	#include <array>
+	using namespace std;
 
+	int main()
+	{
+	  array<int,3> myarray {10,20,30};
+
+	  for (int i=0; i<myarray.size(); i++)
+	  myarray[i]++;
+
+	  for (int elem : myarray)
+	    cout << elem << '\n';
+	}
+
+As you can see, both kinds of arrays use the same syntax to access its elements: `myarray[i]`. Other than that, the main differences lay on the declaration of the array, and the inclusion of an additional header for the *library array*. Notice also how it is easy to access the size of the *library array*.
