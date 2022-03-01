@@ -1,6 +1,6 @@
 ### Array
 	
-An array is a series of elements of the same type placed in contiguous memory locations that can be individually referenced by adding an index to a unique identifier.
+An array is a series of elements of the same type placed in contiguous memory locations that can be individually accessed by adding an index to a unique identifier. To add to it, an array in C++ can store derived data types such as the structures, pointers etc.
 
 That means that, for example, five values of type `int` can be declared as an array without having to declare 5 different variables (each with its own identifier). Instead, using an array, the five `int` values are stored in contiguous memory locations, and all five can be accessed using the same identifier, with the proper index.
 
@@ -16,7 +16,7 @@ Like a regular variable, an array must be declared before it is used. A typical 
 
 Therefore, the `foo` array, with five elements of type `int`, can be declared as:
 
-where type is a valid type (such as `int, float...`), `name` is a valid identifier and the `elements` field (which is always enclosed in square brackets []), specifies the length of the array in terms of the number of elements.
+where type is a valid type (such as `int, float, double, char...`), `name` is a valid identifier and the `elements` field (which is always enclosed in square brackets []), specifies the length of the array in terms of the number of elements.
 
     int foo [5];
 
